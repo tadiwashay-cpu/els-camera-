@@ -67,6 +67,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.WindowMetrics;
+import android.preference.PreferenceManager; // ELS: to read the ELS video look setting
+import android.widget.Toast; // ELS: to tell the user whether the ELS stage started
 
 /** Provides support using Android 5's Camera 2 API
  *  android.hardware.camera2.*.
@@ -274,6 +276,8 @@ public class CameraController2 extends CameraController {
     private Handler handler;
     private Executor executor;
     private Surface video_recorder_surface;
+    // ELS: GPU stage between the camera and the video recorder, or null if not in use
+    private ElsRenderer els_renderer;
 
     private int preview_width;
     private int preview_height;
@@ -1446,6 +1450,71 @@ public class CameraController2 extends CameraController {
                 }
                 extensionSession = null;
             }
+        }
+        // ELS: the GPU stage only lives as long as the capture session it feeds
+        releaseElsRenderer();
+    }
+
+    /** ELS: frees the GPU stage, if there is one.
+     */
+    private void releaseElsRenderer() {
+        ElsRenderer renderer;
+        synchronized( background_camera_lock ) {
+            renderer = els_renderer;
+            els_renderer = null;
+        }
+        if( renderer != null ) {
+            renderer.release();
+        }
+    }
+
+    /** ELS: if the user chose an ELS video look, puts the GPU stage between the camera and the
+     *  video recorder.
+     * @param recorder_surface The video recorder's input surface.
+     * @return The surface the camera should write to: the GPU stage's input if it started,
+     *         otherwise recorder_surface unchanged (so recording always works).
+     */
+    private Surface setupElsRenderer(Surface recorder_surface) {
+        releaseElsRenderer(); // should already be null, but be safe
+        if( recorder_surface == null ) {
+            return null;
+        }
+        int mode = ElsRenderer.MODE_OFF;
+        try {
+            String value = PreferenceManager.getDefaultSharedPreferences(context).getString("preference_els_mode", "off");
+            mode = ElsRenderer.modeFromPref(value);
+        }
+        catch(RuntimeException e) {
+            Log.e(TAG, "failed to read ELS preference: " + e);
+        }
+        if( mode == ElsRenderer.MODE_OFF ) {
+            return recorder_surface;
+        }
+        if( want_video_high_speed || sessionType == SessionType.SESSIONTYPE_EXTENSION ) {
+            showElsToast("ELS look is not available in this video mode");
+            return recorder_surface;
+        }
+        try {
+            ElsRenderer renderer = new ElsRenderer(recorder_surface, mode);
+            els_renderer = renderer;
+            showElsToast("ELS look: " + ElsRenderer.modeName(mode) + " (" + renderer.getWidth() + "x" + renderer.getHeight() + ")");
+            return renderer.getInputSurface();
+        }
+        catch(RuntimeException e) {
+            Log.e(TAG, "failed to start ELS renderer: " + e);
+            showElsToast("ELS look failed to start, recording normally");
+            return recorder_surface;
+        }
+    }
+
+    private void showElsToast(final String message) {
+        if( context instanceof Activity ) {
+            ((Activity)context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -5389,7 +5458,7 @@ public class CameraController2 extends CameraController {
 
             synchronized( background_camera_lock ) {
                 if( video_recorder != null )
-                    video_recorder_surface = video_recorder.getSurface();
+                    video_recorder_surface = setupElsRenderer(video_recorder.getSurface()); // ELS: may route the camera through the GPU stage
                 else
                     video_recorder_surface = null;
                 if( MyDebug.LOG )
