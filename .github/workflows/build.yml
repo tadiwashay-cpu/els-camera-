@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Use fixed debug signing key
+        run: mkdir -p ~/.android && cp debug.keystore ~/.android/debug.keystore
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
