@@ -17,6 +17,16 @@
         android:defaultValue="false"
         />
 
+    <!-- ELS: GPU de-sharpen and colour stage for the recorded video -->
+    <ListPreference
+        android:key="preference_els_mode"
+        android:title="@string/preference_els_mode"
+        android:summary="%s"
+        android:entries="@array/preference_els_mode_entries"
+        android:entryValues="@array/preference_els_mode_values"
+        android:defaultValue="off"
+        />
+
     <ListPreference
         android:key="preference_video_output_format"
         android:title="@string/preference_video_output_format"
