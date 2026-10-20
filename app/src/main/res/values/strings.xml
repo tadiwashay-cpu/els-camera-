@@ -1114,4 +1114,21 @@
             <li>Various other improvements and bug fixes.\n</li>
         </ul>
     </string>
+
+    <!-- ELS: GPU de-sharpen and colour stage for recorded video -->
+    <string name="preference_els_mode">ELS video look (recording only, preview unchanged)</string>
+    <string-array name="preference_els_mode_entries">
+        <item>Off</item>
+        <item>Natural: less harsh, gentle colour</item>
+        <item>Vivid: richer colour</item>
+        <item>Soft: strongest softening</item>
+        <item>De-sharpen only: no colour change</item>
+    </string-array>
+    <string-array name="preference_els_mode_values">
+        <item>off</item>
+        <item>natural</item>
+        <item>vivid</item>
+        <item>soft</item>
+        <item>desharpen</item>
+    </string-array>
 </resources>
