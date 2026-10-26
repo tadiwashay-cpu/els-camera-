@@ -12,7 +12,7 @@ import android.app.FragmentManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
-//import android.content.Intent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
@@ -367,6 +367,20 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
 
                         clickedPrivacyPolicy();
                     }
+                    return false;
+                }
+            });
+        }
+
+        {
+            // ELS: capability report
+            final Preference pref = findPreference("preference_els_capability_report");
+            pref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    if( MyDebug.LOG )
+                        Log.d(TAG, "user clicked ELS capability report");
+                    startActivity(new Intent(MyPreferenceFragment.this.getActivity(), ElsCapabilityActivity.class));
                     return false;
                 }
             });

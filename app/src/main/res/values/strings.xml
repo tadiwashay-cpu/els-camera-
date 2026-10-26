@@ -1131,4 +1131,12 @@
         <item>soft</item>
         <item>desharpen</item>
     </string-array>
+
+    <!-- ELS: capability report (phase 2) -->
+    <string name="els_capability_report">ELS capability report</string>
+    <string name="els_capability_report_summary">What this phone\'s cameras, encoders and motion sensors expose to apps (sizes, frame rates, sharpening and noise modes). Copy or share it for tuning.</string>
+    <string name="els_capability_collecting">Collecting camera information…</string>
+    <string name="els_capability_copy">Copy</string>
+    <string name="els_capability_share">Share</string>
+    <string name="els_capability_copied">Report copied</string>
 </resources>

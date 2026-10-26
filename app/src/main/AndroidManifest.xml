@@ -80,6 +80,14 @@
             android:exported="false"
         >
         </activity>
+        <!-- ELS: capability report -->
+        <activity
+            android:name="net.sourceforge.opencamera.ElsCapabilityActivity"
+            android:label="@string/els_capability_report"
+            android:theme="@android:style/Theme.DeviceDefault"
+            android:exported="false"
+        >
+        </activity>
 
         <!-- should not change the android:name, including moving to a subpackage - see http://android-developers.blogspot.co.uk/2011/06/things-that-cannot-change.html -->
         <activity

@@ -2,7 +2,7 @@ name: Build APK
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+  pull_request:
 jobs:
   build:
     runs-on: ubuntu-latest
